@@ -62,22 +62,16 @@
         input[type="file"] {
             padding: 0.5rem;
         }
-        .submit-btn, .whatsapp-btn {
+        .submit-btn {
             width: 100%;
             padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
             border: none;
             border-radius: 5px;
             font-family: 'Poppins', sans-serif;
             font-size: 1.1rem;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            box-sizing: border-box;
-        }
-        .submit-btn {
-            background-color: var(--primary-color);
-            color: white;
             transition: background-color 0.3s ease;
         }
         .submit-btn:hover:not(:disabled) {
@@ -87,19 +81,6 @@
             background-color: #a0a0a0;
             cursor: not-allowed;
         }
-        /* --- [CSS BARU DITAMBAHKAN] --- */
-        .whatsapp-btn {
-            background-color: var(--success-color);
-            color: white;
-            margin-top: 10px;
-            display: none; /* Sembunyi secara default */
-        }
-        #status {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 500;
-        }
-        /* --- [AKHIR CSS BARU] --- */
         #progressBarContainer {
             width: 100%;
             background-color: #f0f0f0;
@@ -118,6 +99,29 @@
             font-size: 14px;
             transition: width 0.3s ease;
         }
+        .popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease, top 0.4s ease;
+            z-index: 1000;
+            text-align: center;
+        }
+        .popup.show {
+            opacity: 1;
+            visibility: visible;
+            top: 40px;
+        }
+        .popup.success { background-color: var(--success-color); }
+        .popup.error { background-color: var(--error-color); }
     </style>
 </head>
 <body>
@@ -152,7 +156,7 @@
                 <label for="jumlahPack">Jumlah Pack</label>
                 <input type="tel" id="jumlahPack" name="jumlahPack" placeholder="angka saja, contoh: 2">
             </div>
-            <div class="input-group">
+			<div class="input-group">
                 <label>Upload Foto Barang (Maks. 5)</label>
                 <input type="file" name="fileUpload" accept="image/*" multiple style="margin-top: 8px;">
             </div>
@@ -161,43 +165,63 @@
                 <label><input type="radio" name="kelengkapanStatus" value="Lengkap" required> Lengkap</label>
                 <label><input type="radio" name="kelengkapanStatus" value="Belum Lengkap" required> Belum Lengkap</label>
             </div>
-
             <div id="progressBarContainer">
                 <div id="progressBar">0%</div>
             </div>
-
-            <div id="status"></div>
             <button type="submit" id="submitButton" class="submit-btn">Kirim</button>
-            <a href="#" id="whatsappButton" class="whatsapp-btn">Kirim ke WhatsApp</a>
-            </form>
+        </form>
     </div>
+    <div id="popup" class="popup"></div>
 
     <script>
-        // --- [KODE DIBAWAH INI TELAH DIMODIFIKASI SECARA SIGNIFIKAN] ---
-        const scriptURL = ('https://script.google.com/macros/s/AKfycbwa2rGtI78JoZJLHzUdm448JIyobRnjpO2roBQ9CvYQSL_UOX9n_N8-JQvLWmAlV9Ee/exec');
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwa2rGtI78JoZJLHzUdm448JIyobRnjpO2roBQ9CvYQSL_UOX9n_N8-JQvLWmAlV9Ee/exec'; // <-- GANTI DENGAN URL ANDA
         const form = document.getElementById('cekForm');
         const submitButton = document.getElementById('submitButton');
         const progressBarContainer = document.getElementById('progressBarContainer');
         const progressBar = document.getElementById('progressBar');
-        
-        // Elemen baru untuk tombol WhatsApp dan status
-        const whatsappButton = document.getElementById('whatsappButton');
-        const statusDiv = document.getElementById('status');
-        let shouldReloadAfterVisibility = false;
 
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && shouldReloadAfterVisibility) {
-                console.log("Halaman kembali aktif, melakukan refresh.");
-                window.location.reload();
+        // Fungsi untuk menyimpan data formulir ke session storage agar tidak hilang
+        form.addEventListener('change', () => {
+            const formData = new FormData(form);
+            for (let [key, value] of formData.entries()) {
+                if (typeof value === 'object' && value.name === '') continue; // Abaikan input file kosong
+                if (element.type !== 'file') {
+                    sessionStorage.setItem(key, value);
+                }
             }
         });
 
-        // (Fungsi untuk menyimpan dan memuat data form tidak berubah)
+        // Muat data dari session storage saat halaman dibuka
+        window.addEventListener('load', () => {
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                const value = sessionStorage.getItem(key);
+                const element = form.elements[key];
+                if (element) {
+                    if (element.type === 'radio') {
+                        document.querySelector(`input[name="${key}"][value="${value}"]`).checked = true;
+                    } else if (element.type !== 'file') {
+                        element.value = value;
+                    }
+                }
+            }
+        });
 
-        // Fungsi kompresi gambar (tidak berubah)
+        // Fungsi untuk menampilkan notifikasi popup
+        function showPopup(message, type) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.className = `popup ${type} show`;
+            setTimeout(() => {
+                popup.className = popup.className.replace(' show', '');
+            }, 3000);
+        }
+        
+        // Fungsi untuk kompresi gambar sebelum diunggah
         function compressImage(file, quality = 0.6, maxSize = 1024) {
             return new Promise((resolve, reject) => {
                 if (!file) return resolve(null);
+                
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = event => {
@@ -229,28 +253,15 @@
                 reader.onerror = error => reject(error);
             });
         }
-        
-        // Fungsi baru untuk mereset tampilan form ke kondisi awal
-        function resetFormState() {
-            form.reset();
-            sessionStorage.clear();
-            submitButton.disabled = false;
-            submitButton.style.display = 'block'; // Tampilkan lagi tombol kirim
-            submitButton.textContent = 'Kirim';
-            whatsappButton.style.display = 'none'; // Sembunyikan tombol WA
-            statusDiv.innerHTML = '';
-            progressBarContainer.style.display = 'none';
-        }
-        
-        // Logika pengiriman form yang diperbarui
+
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             submitButton.disabled = true;
             submitButton.textContent = 'Mengirim...';
             progressBarContainer.style.display = 'block';
+            progressBar.style.backgroundColor = 'var(--success-color)';
             progressBar.style.width = '0%';
             progressBar.textContent = '0%';
-            statusDiv.innerHTML = ''; // Kosongkan status
 
             try {
                 // Proses kompresi file
@@ -278,70 +289,35 @@
                     file5: fileDataArray[4]
                 };
 
-                // Mengirim data ke Google Apps Script dan MENUNGGU RESPON
+                // Mengirim data ke Google Apps Script
                 const response = await fetch(scriptURL, {
                     method: 'POST',
+                    mode: 'no-cors', // Diperlukan untuk pengiriman ke Apps Script dari sumber eksternal
                     body: JSON.stringify(formData),
                     headers: { 'Content-Type': 'application/json' }
                 });
 
-                // Periksa apakah response-nya OK
-                if (!response.ok) {
-                    throw new Error(`Gagal terhubung ke server: ${response.statusText}`);
-                }
-
-                // Ambil data JSON dari response
-                const result = await response.json();
-                
                 progressBar.style.width = '100%';
                 progressBar.textContent = '100% - Selesai!';
 
-                if (result.status === 'success') {
-                    // Panggil fungsi onSuccess yang baru
-                    onSuccess(result);
-                } else {
-                    throw new Error(result.message);
-                }
+                // Karena mode 'no-cors' tidak memberikan balasan, kita anggap berhasil jika tidak ada error
+                showPopup('Input data berhasil', 'success');
+                form.reset();
+                sessionStorage.clear(); // Hapus data sementara setelah berhasil
+                setTimeout(() => {
+                    progressBarContainer.style.display = 'none';
+                }, 2000);
+
             } catch (error) {
                 console.error('Error!', error.message);
-                statusDiv.textContent = 'Input gagal: ' + error.message;
+                showPopup('Input gagal: ' + error.message, 'error');
                 progressBar.style.backgroundColor = 'var(--error-color)';
                 progressBar.textContent = 'Gagal';
+            } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Kirim';
             }
         });
-
-        // --- FUNGSI onSUCCESS DIKEMBALIKAN DAN DISESUAIKAN ---
-        function onSuccess(response) {
-            submitButton.style.display = 'none'; // Sembunyikan tombol submit
-            
-            if (response.whatsappLink) {
-                whatsappButton.style.display = 'block';
-                whatsappButton.href = response.whatsappLink;
-                statusDiv.innerHTML = `Data berhasil dikirim. <br> Silakan klik tombol di bawah untuk kirim ke WhatsApp.`;
-                console.log("Link WhatsApp yang dibuat: " + response.whatsappLink);
-
-                whatsappButton.addEventListener('click', function(event) {
-                    event.preventDefault(); 
-                    window.open(whatsappButton.href, '_blank');
-                    
-                    shouldReloadAfterVisibility = true; 
-                    
-                    setTimeout(function() {
-                        if (!document.hidden) {
-                            resetFormState(); // Panggil fungsi reset
-                            window.location.reload();
-                        } else {
-                            console.log("Refresh ditunda karena halaman tidak aktif.");
-                        }
-                    }, 500); 
-                });
-            } else {
-                statusDiv.textContent = 'Data berhasil dikirim, tetapi tautan WhatsApp tidak tersedia.';
-                setTimeout(resetFormState, 3000); // Reset form setelah 3 detik
-            }
-        }
     </script>
 </body>
 </html>

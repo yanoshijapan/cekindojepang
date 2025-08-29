@@ -217,6 +217,7 @@
     const progressBar = document.getElementById('progressBar');
     const statusDiv = document.getElementById('status');
     const whatsappBtn = document.getElementById('whatsapp-btn');
+    const STORAGE_KEY = 'formData';
 
     const handleBeforeUnload = (event) => {
         event.preventDefault(); 
@@ -227,6 +228,83 @@
         window.addEventListener('beforeunload', handleBeforeUnload);
     });
 
+    function saveFormData() {
+        const fileList = [];
+        // Simpan info nama dan ukuran file, bukan file-nya
+        for (const file of fotoInput.files) {
+            fileList.push({ name: file.name, size: file.size });
+        }
+
+        const data = {
+            nama: namaInput.value,
+            whatsapp: waInput.value,
+            listBarang: document.getElementById('list-Barang').value,
+            beratBagasi: bagasiInput.value,
+            beratKabin: kabinInput.value,
+            beratKhusus: khususInput.value,
+            beratTotal: totalInput.value,
+            jumlahPack: packInput.value,
+            kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '',
+            fileInfo: fileList // Simpan info file
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadFormData() {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            namaInput.value = data.nama || '';
+            waInput.value = data.whatsapp || '';
+            document.getElementById('list-Barang').value = data.listBarang || '';
+            bagasiInput.value = data.beratBagasi || '';
+            kabinInput.value = data.beratKabin || '';
+            khususInput.value = data.beratKhusus || '';
+            totalInput.value = data.beratTotal || '';
+            packInput.value = data.jumlahPack || '';
+
+            if (data.kelengkapanStatus) {
+                document.querySelector(`input[name="kelengkapanStatus"][value="${data.kelengkapanStatus}"]`).checked = true;
+            }
+
+            // Tampilkan pengingat file yang sebelumnya dipilih
+            if (data.fileInfo && data.fileInfo.length > 0) {
+                const fileReminder = document.createElement('div');
+                fileReminder.style.marginTop = '10px';
+                fileReminder.style.padding = '10px';
+                fileReminder.style.backgroundColor = '#f0f0f0';
+                fileReminder.style.border = '1px dashed #ccc';
+                fileReminder.style.borderRadius = '5px';
+                let fileNames = data.fileInfo.map(f => f.name).join(', ');
+                fileReminder.innerHTML = `<strong>File sebelumnya:</strong> ${fileNames}. <br/><small>Silakan pilih ulang file-file ini.</small>`;
+                fotoInput.parentElement.insertBefore(fileReminder, previewContainer);
+            }
+        }
+    }
+
+    function clearFormData() {
+        localStorage.removeItem(STORAGE_KEY);
+    }
+    
+    // ======================================================================
+    // ==== EVENT LISTENERS & LOGIKA FORM SUBMISSION (DENGAN PENYESUAIAN) ====
+    // ======================================================================
+    
+    // PEMANGGILAN FUNGSI: Muat data saat halaman dibuka
+    document.addEventListener('DOMContentLoaded', loadFormData);
+
+    // PEMANGGILAN FUNGSI: Simpan data setiap kali ada input/perubahan pada form
+    form.addEventListener('input', saveFormData);
+
+    const handleBeforeUnload = (event) => {
+        event.preventDefault();
+        event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    form.addEventListener('input', () => {
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    });
+    
     const updateBeratTotal = () => {
         const bagasi = parseFloat(bagasiInput.value) || 0;
         const kabin = parseFloat(kabinInput.value) || 0;
@@ -292,9 +370,13 @@
 
                     form.reset();
                     previewContainer.innerHTML = '';
+
+                    clearFormData();
                     
                     window.removeEventListener('beforeunload', handleBeforeUnload);
-                    
+
+                    const fileReminder = fotoInput.parentElement.querySelector('div[style*="margin-top: 10px"]');
+                    if(fileReminder) fileReminder.remove();
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }

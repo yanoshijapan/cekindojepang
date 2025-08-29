@@ -4,22 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Pengiriman Barang</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
+            padding: 1rem;
+            -webkit-text-size-adjust: 100%;
         }
         .container {
-            max-width: 600px;
-            margin: auto;
+            max-width: 800px;
+            margin: 0 auto;
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         h2 {
+			font-family: 'Poppins', sans-serif;
             text-align: center;
             color: #333;
         }
@@ -28,15 +34,17 @@
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0.5rempx;
             font-weight: bold;
         }
         input[type="text"], input[type="number"], input[type="file"], select {
             width: 100%;
-            padding: 10px;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
         #preview-container {
             display: grid;
@@ -52,14 +60,16 @@
         }
         .submit-btn {
             width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: #fff;
+            padding: 1rem;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: background-color 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            box-sizing: border-box;
         }
         .submit-btn:hover {
             background-color: #0056b3;
@@ -115,20 +125,20 @@
         </div>
         <div class="form-group">
             <label for="list-barang">List Barang</label>
-            <textarea id="listBarang" name="listBarang">
+            <textarea id="list-Barang" name="listBarang">
 			</textarea>
         </div>
         <div class="form-group">
             <label for="berat-bagasi">Berat Bagasi (kg)</label>
-            <input type="tel" id="berat-bagasi" name="beratBagasi" value="0">
+            <input type="tel" id="berat-bagasi" name="beratBagasi" placeholder="angka saja, contoh: 5">
         </div>
         <div class="form-group">
             <label for="berat-kabin">Berat Kabin (kg)</label>
-            <input type="tel" id="berat-kabin" name="beratKabin" value="0">
+            <input type="tel" id="berat-kabin" name="beratKabin" placeholder="angka saja, contoh: 5">
         </div>
         <div class="form-group">
             <label for="berat-khusus">Berat Khusus (kg)</label>
-            <input type="tel" id="berat-khusus" name="beratKhusus" value="0">
+            <input type="tel" id="berat-khusus" name="beratKhusus" placeholder="angka saja, contoh: 5">
         </div>
         <div class="form-group">
             <label for="berat-total">Berat Total (kg)</label>
@@ -136,12 +146,17 @@
         </div>
 		<div class="form-group">
             <label for="total-packing">Jumlah Packingan</label>
-            <input type="tel" id="total-packing" name="jumlahPack" value="0">
+            <input type="tel" id="total-packing" name="jumlahPack" placeholder="angka saja, contoh: 5">
         </div>
         <div class="form-group">
             <label for="foto">Foto Barang (maks. 10 foto)</label>
             <input type="file" id="foto" name="foto" multiple accept="image/*" required>
             <div id="preview-container"></div>
+        </div>
+		<div class="input-group">
+            <label>Status Kelengkapan Barang</label>
+            <label><input type="radio" name="kelengkapanStatus" value="Lengkap" required> Lengkap</label>
+            <label><input type="radio" name="kelengkapanStatus" value="Belum Lengkap" required> Belum Lengkap</label>
         </div>
         <button type="submit" class="submit-btn" id="submit-btn">Kirim Data</button>
         <div class="progress-bar" id="progress-bar"></div>
@@ -159,6 +174,7 @@
 	const packInput = document.getElementById('total-packing');
     const fotoInput = document.getElementById('foto');
     const previewContainer = document.getElementById('preview-container');
+	const statusInput = document.getElementById('status-kelengkapan');
     const submitBtn = document.getElementById('submit-btn');
     const progressBar = document.getElementById('progress-bar');
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa2rGtI78JoZJLHzUdm448JIyobRnjpO2roBQ9CvYQSL_UOX9n_N8-JQvLWmAlV9Ee/exec'; // Ganti dengan URL deploy Apps Script Anda
@@ -205,12 +221,13 @@
         const formData = new FormData();
         formData.append('nama', namaInput.value);
         formData.append('whatsapp', waInput.value);
-        formData.append('listBarang', document.getElementById('list-barang').value);
+        formData.append('listBarang', document.getElementById('listBarang').value);
         formData.append('beratBagasi', bagasiInput.value);
         formData.append('beratKabin', kabinInput.value);
         formData.append('beratKhusus', khususInput.value);
         formData.append('beratTotal', totalInput.value);
 		formData.append('jumlahPack', packInput.value);
+		formData.append('kelengkapanStatus', statusInput.value);
 		
 
         const files = fotoInput.files;

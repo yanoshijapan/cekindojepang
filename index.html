@@ -354,10 +354,21 @@
                 if (result.status === 'success') {
                     statusDiv.innerText = 'Data berhasil dikirim!';
                     statusDiv.style.color = 'var(--success-color)';
-                    
-                    // Siapkan dan tampilkan tombol WhatsApp
-                    const waLink = `https://wa.me/${result.whatsapp}?text=${encodeURIComponent(`Halo kak ${result.nama}, barang Anda sudah kami cek. Foto bisa dilihat di sini: ${result.folderUrl}`)}`;
-                    whatsappBtn.href = waLink;
+
+                    const namaKakak = result.nama;
+                    const nomorWaBersih = result.whatsapp;
+                    const urlFolderBaru = result.folderUrl;
+
+                    const tanggalHariIni = new Date();
+                    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                    const tanggalFormatted = tanggalHariIni.toLocaleDateString('id-ID', options);
+
+                    const whatsappMessage = `Hai kak ${namaKakak}, Barang kakak sudah kami terima dan sudah di cek per tanggal ${tanggalFormatted}. Semua foto barang kakak dapat dilihat di folder ini ya: ${urlFolderBaru}`;
+
+                    const encodedMessage = encodeURIComponent(whatsappMessage);
+                    const whatsappLink = `https://wa.me/${nomorWaBersih}?text=${encodedMessage}`;
+
+                    whatsappBtn.href = whatsappLink;
                     whatsappBtn.style.display = 'block';
 
                     form.reset();

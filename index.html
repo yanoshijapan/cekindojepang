@@ -336,8 +336,29 @@
         progressBar.innerText = '20%';
         
         const formData = new FormData(form); // Cara lebih ringkas mengambil semua data form
-        for (const file of fotoInput.files) {
-            formData.append('foto', file);
+        formData.append('nama', namaInput.value);
+        formData.append('whatsapp', waInput.value);
+        formData.append('listBarang', document.getElementById('list-Barang').value);
+        formData.append('beratBagasi', bagasiInput.value);
+        formData.append('beratKabin', kabinInput.value);
+        formData.append('beratKhusus', khususInput.value);
+        formData.append('beratTotal', totalInput.value);
+        formData.append('jumlahPack', packInput.value);
+        
+        const selectedStatus = document.querySelector('input[name="kelengkapanStatus"]:checked');
+        formData.append('kelengkapanStatus', selectedStatus ? selectedStatus.value : 'Tidak diisi');
+
+        // 2. Tambahkan semua file dari input foto satu per satu
+        const files = fotoInput.files;
+        if (files.length === 0) {
+            alert('Harap pilih setidaknya satu foto.');
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Kirim Data';
+            progressBarContainer.style.display = 'none';
+            return; // Hentikan proses jika tidak ada file
+        }
+        for (let i = 0; i < files.length; i++) {
+            formData.append('foto', files[i]);
         }
 
         try {

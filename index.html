@@ -218,7 +218,15 @@
     const statusDiv = document.getElementById('status');
     const whatsappBtn = document.getElementById('whatsapp-btn');
 
-    // === FUNGSI UPDATE BERAT TOTAL (TETAP SAMA) ===
+    const handleBeforeUnload = (event) => {
+        event.preventDefault(); 
+        event.returnValue = ''; 
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    form.addEventListener('input', () => {
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    });
+
     const updateBeratTotal = () => {
         const bagasi = parseFloat(bagasiInput.value) || 0;
         const kabin = parseFloat(kabinInput.value) || 0;
@@ -249,8 +257,6 @@
     // === HANDLE FORM SUBMISSION (DISESUAIKAN DENGAN STYLE BARU) ===
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        // Reset tampilan UI sebelum mengirim
         submitBtn.disabled = true;
         submitBtn.innerText = 'Mengirim...';
         statusDiv.innerText = '';
@@ -260,8 +266,6 @@
         progressBar.innerText = '20%';
         
         const formData = new FormData(form); // Cara lebih ringkas mengambil semua data form
-        
-        // Menambahkan file secara manual ke FormData
         for (const file of fotoInput.files) {
             formData.append('foto', file);
         }
@@ -288,6 +292,9 @@
 
                     form.reset();
                     previewContainer.innerHTML = '';
+                    
+                    window.removeEventListener('beforeunload', handleBeforeUnload);
+                    
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }

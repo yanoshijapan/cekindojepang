@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Pengiriman Barang</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary-color: #17a2b8;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --light-gray: #f9f9f9;
+            --dark-gray: #333;
+            --border-color: #ddd;
+        }
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--light-gray);
@@ -19,25 +28,27 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
+            background-color: #fff;
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        h2 {
-			font-family: 'Poppins', sans-serif;
+        h1 { /* Mengganti h2 menjadi h1 untuk judul utama */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
             text-align: center;
-            color: #333;
+            font-size: 1.5rem;
+            color: var(--dark-gray);
         }
-        .form-group {
-            margin-bottom: 15px;
+        .input-group {
+            margin-bottom: 1.25rem;
         }
         label {
             display: block;
-            margin-bottom: 0.5rempx;
-            font-weight: bold;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
-        input[type="text"], input[type="number"], input[type="file"], select {
+        input[type="text"], input[type="tel"], textarea, input[type="file"] {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border-color);
@@ -46,17 +57,12 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-        #preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+        textarea {
+            resize: vertical;
+            min-height: 100px;
         }
-        #preview-container img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+        input[type="file"] {
+            padding: 0.5rem;
         }
         .submit-btn {
             width: 100%;
@@ -70,101 +76,129 @@
             text-decoration: none;
             display: block;
             box-sizing: border-box;
+            background-color: var(--primary-color);
+            color: white;
+            transition: background-color 0.3s ease;
         }
-        .submit-btn:hover {
-            background-color: #0056b3;
+        .submit-btn:hover:not(:disabled) {
+            background-color: #138496;
         }
-        .progress-bar {
-            width: 0%;
-            height: 10px;
-            background-color: #28a745;
-            border-radius: 4px;
-            transition: width 0.3s;
+        .submit-btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+        #preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
             margin-top: 10px;
         }
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            border-radius: 8px;
+        #preview-container img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        #progressBarContainer {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 1.25rem;
+            display: none; /* Sembunyi secara default */
+        }
+        #progressBar {
+            width: 0%;
+            height: 25px;
+            background-color: var(--success-color);
+            border-radius: 5px;
             text-align: center;
-            color: #fff;
-            z-index: 1000;
+            line-height: 25px;
+            color: white;
+            font-size: 14px;
+            transition: width 0.3s ease;
         }
-        .popup.success {
-            background-color: #28a745;
+        #status {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
         }
-        .popup.error {
-            background-color: #dc3545;
-        }
-        .popup a.whatsapp-btn {
-            display: inline-block;
+        .whatsapp-btn {
+            display: none; /* Sembunyi secara default */
             margin-top: 15px;
             padding: 10px 20px;
-            background-color: #25d366;
+            background-color: var(--success-color);
             color: #fff;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Form Cek Bsrang Indo-Jepang</h2>
+    <h1>Form Cek Barang Indo-Jepang</h1>
     <form id="submissionForm">
-        <div class="form-group">
+        <div class="input-group">
             <label for="nama">Nama</label>
-            <input type="text" id="nama" name="nama">
+            <input type="text" id="nama" name="nama" required>
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="whatsapp">Nomor WhatsApp</label>
-            <input type="tel" id="whatsapp" name="whatsapp">
+            <input type="tel" id="whatsapp" name="whatsapp" required placeholder="Contoh: 08123456789">
         </div>
-        <div class="form-group">
-            <label for="list-barang">List Barang</label>
-            <textarea id="list-Barang" name="listBarang">
-			</textarea>
+        <div class="input-group">
+            <label for="list-Barang">List Barang</label>
+            <textarea id="list-Barang" name="listBarang" required></textarea>
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="berat-bagasi">Berat Bagasi (kg)</label>
             <input type="tel" id="berat-bagasi" name="beratBagasi" placeholder="angka saja, contoh: 5">
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="berat-kabin">Berat Kabin (kg)</label>
             <input type="tel" id="berat-kabin" name="beratKabin" placeholder="angka saja, contoh: 5">
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="berat-khusus">Berat Khusus (kg)</label>
             <input type="tel" id="berat-khusus" name="beratKhusus" placeholder="angka saja, contoh: 5">
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="berat-total">Berat Total (kg)</label>
             <input type="tel" id="berat-total" name="beratTotal" readonly>
         </div>
-		<div class="form-group">
+        <div class="input-group">
             <label for="total-packing">Jumlah Packingan</label>
             <input type="tel" id="total-packing" name="jumlahPack" placeholder="angka saja, contoh: 5">
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label for="foto">Foto Barang (maks. 10 foto)</label>
             <input type="file" id="foto" name="foto" multiple accept="image/*" required>
             <div id="preview-container"></div>
         </div>
-		<div class="input-group">
+        <div class="input-group">
             <label>Status Kelengkapan Barang</label>
-            <label><input type="radio" name="kelengkapanStatus" value="Lengkap" required> Lengkap</label>
-            <label><input type="radio" name="kelengkapanStatus" value="Belum Lengkap" required> Belum Lengkap</label>
+            <label style="display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal;">
+                <input type="radio" name="kelengkapanStatus" value="Lengkap" required style="width: auto; margin-right: 8px;"> Lengkap
+            </label>
+            <label style="display: inline-flex; align-items: center; font-weight: normal;">
+                <input type="radio" name="kelengkapanStatus" value="Belum Lengkap" required style="width: auto; margin-right: 8px;"> Belum Lengkap
+            </label>
         </div>
         <button type="submit" class="submit-btn" id="submit-btn">Kirim Data</button>
-        <div class="progress-bar" id="progress-bar"></div>
+        
+        <div id="progressBarContainer">
+            <div id="progressBar">0%</div>
+        </div>
+        <div id="status"></div>
+        <a href="#" id="whatsapp-btn" class="whatsapp-btn" target="_blank">Kirim ke WhatsApp</a>
+
     </form>
 </div>
 
 <script>
-    // --- Bagian deklarasi variabel (sudah benar, kecuali 1 perbaikan) ---
+    // === DEKLARASI VARIABEL (DENGAN PENAMBAHAN ELEMEN BARU) ===
     const form = document.getElementById('submissionForm');
     const namaInput = document.getElementById('nama');
     const waInput = document.getElementById('whatsapp');
@@ -175,31 +209,31 @@
     const packInput = document.getElementById('total-packing');
     const fotoInput = document.getElementById('foto');
     const previewContainer = document.getElementById('preview-container');
-    // PERBAIKAN 1: Variabel 'statusInput' dihapus karena tidak efektif untuk radio button.
-    // Kita akan ambil nilainya langsung saat form disubmit.
     const submitBtn = document.getElementById('submit-btn');
-    const progressBar = document.getElementById('progress-bar');
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa2rGtI78JoZJLHzUdm448JIyobRnjpO2roBQ9CvYQSL_UOX9n_N8-JQvLWmAlV9Ee/exec';
 
-    // --- Bagian fungsi update berat total (sudah benar) ---
+    // Elemen baru dari style
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const progressBar = document.getElementById('progressBar');
+    const statusDiv = document.getElementById('status');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+
+    // === FUNGSI UPDATE BERAT TOTAL (TETAP SAMA) ===
     const updateBeratTotal = () => {
         const bagasi = parseFloat(bagasiInput.value) || 0;
         const kabin = parseFloat(kabinInput.value) || 0;
         const khusus = parseFloat(khususInput.value) || 0;
         totalInput.value = bagasi + kabin + khusus;
     };
-    bagasiInput.addEventListener('input', updateBeratTotal);
-    kabinInput.addEventListener('input', updateBeratTotal);
-    khususInput.addEventListener('input', updateBeratTotal);
+    [bagasiInput, kabinInput, khususInput].forEach(input => input.addEventListener('input', updateBeratTotal));
 
-    // --- Bagian pratinjau foto (sudah benar) ---
+    // === PRATINJAU FOTO (TETAP SAMA) ===
     fotoInput.addEventListener('change', (e) => {
         previewContainer.innerHTML = '';
         const files = e.target.files;
         if (files.length > 10) {
             alert('Maksimal 10 foto.');
-            fotoInput.value = '';
-            return;
+            fotoInput.value = ''; return;
         }
         for (const file of files) {
             const reader = new FileReader();
@@ -212,87 +246,73 @@
         }
     });
 
-    // --- Handle form submission (BAGIAN YANG DIPERBAIKI) ---
+    // === HANDLE FORM SUBMISSION (DISESUAIKAN DENGAN STYLE BARU) ===
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Reset tampilan UI sebelum mengirim
         submitBtn.disabled = true;
         submitBtn.innerText = 'Mengirim...';
-        progressBar.style.width = '0%';
+        statusDiv.innerText = '';
+        whatsappBtn.style.display = 'none';
+        progressBarContainer.style.display = 'block';
+        progressBar.style.width = '20%'; // Progress awal
+        progressBar.innerText = '20%';
         
-        // Persiapan data
-        const formData = new FormData();
-        formData.append('nama', namaInput.value);
-        formData.append('whatsapp', waInput.value);
+        const formData = new FormData(form); // Cara lebih ringkas mengambil semua data form
         
-        // PERBAIKAN 2: Mengambil nilai textarea dengan ID yang benar (case-sensitive)
-        formData.append('listBarang', document.getElementById('list-Barang').value);
-
-        formData.append('beratBagasi', bagasiInput.value);
-        formData.append('beratKabin', kabinInput.value);
-        formData.append('beratKhusus', khususInput.value);
-        formData.append('beratTotal', totalInput.value);
-        formData.append('jumlahPack', packInput.value);
-        
-        // PERBAIKAN 3: Cara yang benar untuk mengambil nilai dari radio button yang dipilih
-        const selectedStatus = document.querySelector('input[name="kelengkapanStatus"]:checked');
-        if (selectedStatus) {
-            formData.append('kelengkapanStatus', selectedStatus.value);
-        } else {
-            // Jika tidak ada yang dipilih, kirim string kosong atau beri peringatan
-            formData.append('kelengkapanStatus', 'Tidak diisi'); 
-        }
-
-        const files = fotoInput.files;
-        for (const file of files) {
-            formData.append('foto', file); // 'foto' adalah nama field untuk semua file
+        // Menambahkan file secara manual ke FormData
+        for (const file of fotoInput.files) {
+            formData.append('foto', file);
         }
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            });
+            progressBar.style.width = '50%';
+            progressBar.innerText = 'Mengunggah file...';
+            
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+            
+            progressBar.style.width = '80%';
+            progressBar.innerText = 'Memproses data...';
 
             if (response.ok) {
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showPopup('success', 'Data berhasil dikirim!', result.folderUrl, namaInput.value);
-                    progressBar.style.width = '100%';
+                    statusDiv.innerText = 'Data berhasil dikirim!';
+                    statusDiv.style.color = 'var(--success-color)';
+                    
+                    // Siapkan dan tampilkan tombol WhatsApp
+                    const waLink = `https://wa.me/${result.whatsapp}?text=${encodeURIComponent(`Halo kak ${result.nama}, barang Anda sudah kami cek. Foto bisa dilihat di sini: ${result.folderUrl}`)}`;
+                    whatsappBtn.href = waLink;
+                    whatsappBtn.style.display = 'block';
+
                     form.reset();
                     previewContainer.innerHTML = '';
                 } else {
-                    // Tampilkan pesan error dari server jika ada
-                    showPopup('error', `Gagal kirim data: ${result.message}`);
+                    throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }
             } else {
-                showPopup('error', 'Gagal terhubung ke server.');
+                throw new Error(`Gagal terhubung ke server (Status: ${response.status})`);
             }
+            
+            progressBar.style.width = '100%';
+            progressBar.innerText = 'Selesai!';
+
         } catch (error) {
-            showPopup('error', `Terjadi error: ${error.message}`);
+            statusDiv.innerText = `Error: ${error.message}`;
+            statusDiv.style.color = 'var(--error-color)';
+            progressBar.style.backgroundColor = 'var(--error-color)';
+            progressBar.innerText = 'Gagal';
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = 'Kirim Data';
+            setTimeout(() => { // Sembunyikan progress bar setelah beberapa detik
+                progressBarContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressBar.style.backgroundColor = 'var(--success-color)'; // Kembalikan warna normal
+            }, 5000);
         }
     });
-
-    // --- Fungsi popup (sudah benar) ---
-    function showPopup(type, message, folderUrl = null, nama = null) {
-        // Hapus popup lama jika ada
-        const existingPopup = document.querySelector('.popup');
-        if (existingPopup) existingPopup.remove();
-
-        const popup = document.createElement('div');
-        popup.classList.add('popup', type);
-        popup.innerHTML = `
-            <div>${message}</div>
-            ${type === 'success' ? `<a href="https://wa.me/${waInput.value.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Halo kak ${nama}, barang kakak sudah kami cek per tanggal ${new Date().toLocaleDateString('id-ID')}, dan foto barang kakak bisa di cek disini: ${folderUrl}`)}" class="whatsapp-btn" target="_blank">Kirim Notifikasi WhatsApp</a>` : ''}
-        `;
-        document.body.appendChild(popup);
-        setTimeout(() => {
-            popup.remove();
-        }, 9000);
-    }
 </script>
 
 </body>

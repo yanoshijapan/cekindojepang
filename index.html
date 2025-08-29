@@ -219,14 +219,6 @@
     const whatsappBtn = document.getElementById('whatsapp-btn');
     const STORAGE_KEY = 'formData';
 
-    const handleBeforeUnload = (event) => {
-        event.preventDefault(); 
-        event.returnValue = ''; 
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    form.addEventListener('input', () => {
-        window.addEventListener('beforeunload', handleBeforeUnload);
-    });
 
     function saveFormData() {
         const fileList = [];

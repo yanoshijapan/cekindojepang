@@ -333,42 +333,58 @@
         whatsappBtn.style.display = 'none';
         progressBarContainer.style.display = 'block';
         progressBar.style.width = '20%'; // Progress awal
-        progressBar.innerText = '20%';
+        progressBar.innerText = 'mengirim data';
         
-        const formData = new FormData(form); // Cara lebih ringkas mengambil semua data form
-        formData.append('nama', namaInput.value);
-        formData.append('whatsapp', waInput.value);
-        formData.append('listBarang', document.getElementById('list-Barang').value);
-        formData.append('beratBagasi', bagasiInput.value);
-        formData.append('beratKabin', kabinInput.value);
-        formData.append('beratKhusus', khususInput.value);
-        formData.append('beratTotal', totalInput.value);
-        formData.append('jumlahPack', packInput.value);
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
         
-        const selectedStatus = document.querySelector('input[name="kelengkapanStatus"]:checked');
-        formData.append('kelengkapanStatus', selectedStatus ? selectedStatus.value : 'Tidak diisi');
-
-        // 2. Tambahkan semua file dari input foto satu per satu
-        const files = fotoInput.files;
-        if (files.length === 0) {
-            alert('Harap pilih setidaknya satu foto.');
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Kirim Data';
-            progressBarContainer.style.display = 'none';
-            return; // Hentikan proses jika tidak ada file
-        }
-        for (let i = 0; i < files.length; i++) {
-            formData.append('foto', files[i]);
-        }
-
         try {
+            const files = fotoInput.files;
+            if (files.length === 0) {
+                alert('Harap pilih setidaknya satu foto.');
+                throw new Error("Tidak ada file dipilih.");
+            }
+
+            const textData = {
+                nama: namaInput.value,
+                whatsapp: waInput.value,
+                listBarang: document.getElementById('list-Barang').value,
+                beratBagasi: bagasiInput.value,
+                beratKabin: kabinInput.value,
+                beratKhusus: khususInput.value,
+                beratTotal: totalInput.value,
+                jumlahPack: packInput.value,
+                kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || 'Tidak diisi'
+            };
+        
+            const fileData = [];
+            for (let i = 0; i < files.length; i++) {
+                fileData.push({
+                    fileName: files[i].name,
+                    mimeType: files[i].type,
+                    content: await toBase64(files[i])
+                });
+            }
+
+            const payload = { ...textData, files: fileData };
+    
             progressBar.style.width = '50%';
             progressBar.innerText = 'Mengunggah file...';
-            
-            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-            
+
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+    
             progressBar.style.width = '80%';
             progressBar.innerText = 'Memproses data...';
+        
 
             if (response.ok) {
                 const result = await response.json();

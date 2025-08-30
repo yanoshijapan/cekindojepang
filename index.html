@@ -324,6 +324,42 @@
         }
     });
 
+    function compressImage(file, maxSizeKB = 300) {
+        return new Promise((resolve, reject) => {
+            const fileSizeKB = file.size / 1024;
+
+            // Jika file sudah cukup kecil, tidak perlu kompresi
+            if (fileSizeKB <= maxSizeKB) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                return;
+            }
+
+            const image = new Image();
+            image.src = URL.createObjectURL(file);
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxWidth = 1024; // Atur lebar maksimal gambar, misal 1024px
+                const scaleSize = maxWidth / image.width;
+                canvas.width = maxWidth;
+                canvas.height = image.height * scaleSize;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                // Ubah ke format JPEG dengan kualitas 70% (0.7)
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                
+                URL.revokeObjectURL(image.src); // Bersihkan memori
+                resolve(compressedBase64);
+            };
+            image.onerror = error => reject(error);
+        });
+    }
+
+    const form = document.getElementById('submissionForm');
     // === HANDLE FORM SUBMISSION (DISESUAIKAN DENGAN STYLE BARU) ===
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -363,10 +399,16 @@
         
             const fileData = [];
             for (let i = 0; i < files.length; i++) {
+                const progress = 10 + (40 / files.length * (i + 1));
+                progressBar.style.width = `${progress}%`;
+                progressBar.innerText = `Memproses file ${i + 1} dari ${files.length}...`;
+    
+                const compressedContent = await compressImage(files[i], 300);
+                
                 fileData.push({
                     fileName: files[i].name,
-                    mimeType: files[i].type,
-                    content: await toBase64(files[i])
+                    mimeType: 'image/jpeg',
+                    content: compressedContent
                 });
             }
 

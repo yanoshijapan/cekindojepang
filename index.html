@@ -572,25 +572,32 @@
             if (response.ok) {
                 const result = await response.json();
                 if (result.status === 'success') {
-                    
-                    // --- BAGIAN PENTING UNTUK DASHBOARD ---
+                    // --- LOGIKA BARU UNTUK REAL-TIME UPDATE ---
                     const tanggalKlik = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
                     const templatePesan = `halo kak ${result.nama}, barang kakak sudah kami terima dan cek per tanggal ${tanggalKlik}. Untuk bukti fotonya kakak bisa cek di link berikut : ${result.folderUrl}`;
-
-                    const params = new URLSearchParams({
+                
+                    // 1. Siapkan data baru
+                    const newData = {
                         nama: result.nama,
                         wa: result.whatsapp,
                         msg: templatePesan
-                    });
-
-                    const urlTujuan = `${DASHBOARD_URL}?${params.toString()}`;
+                    };
+                
+                    // 2. Ambil data lama dari localStorage (jika ada)
+                    const oldData = JSON.parse(localStorage.getItem('dashboardData')) || [];
                     
-                    window.open(urlTujuan, '_blank');
-                    // --- AKHIR BAGIAN PENTING ---
-
-                    statusDiv.innerText = 'Data berhasil dikirim ke Spreadsheet & Dashboard!';
+                    // 3. Tambahkan data baru ke awal array
+                    oldData.unshift(newData);
+                
+                    // 4. Simpan kembali ke localStorage. INI AKAN MEMICU UPDATE DI TAB DASHBOARD
+                    localStorage.setItem('dashboardData', JSON.stringify(oldData));
+                    
+                    // --- AKHIR LOGIKA BARU ---
+                
+                    statusDiv.innerText = 'Data Terkirim! Cek tab dashboard Anda.';
                     statusDiv.style.color = 'var(--success-color)';
                     
+                    // Reset form seperti biasa
                     form.reset();
                     previewContainer.innerHTML = '';
                     clearFormData();

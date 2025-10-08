@@ -163,9 +163,22 @@
             <label for="list-Barang">List Barang</label>
             <textarea id="list-Barang" name="listBarang"></textarea>
         </div>
+        
         <div class="input-group">
-            <label for="berat-total">Berat Total (kg)</label>
-            <input type="tel" id="berat-total" name="beratTotal">
+            <label for="berat-bagasi">Berat Bagasi (kg)</label>
+            <input type="tel" id="berat-bagasi" name="beratBagasi" placeholder="angka saja, contoh: 5">
+        </div>
+        <div class="input-group">
+            <label for="berat-kabin">Berat Kabin (kg)</label>
+            <input type="tel" id="berat-kabin" name="beratKabin" placeholder="angka saja, contoh: 5">
+        </div>
+        <div class="input-group">
+            <label for="berat-khusus">Berat Khusus (kg)</label>
+            <input type="tel" id="berat-khusus" name="beratKhusus" placeholder="angka saja, contoh: 5">
+        </div>
+        <div class="input-group">
+            <label for="berat-total">Berat Total (hasil totalan otomatis, tidak untuk diisi)</label>
+            <input type="tel" id="berat-total" name="beratTotal" readonly>
         </div>
         <div class="input-group">
             <label for="total-packing">Jumlah Packingan</label>
@@ -226,7 +239,10 @@
     const namaInput = document.getElementById('nama');
     const waInput = document.getElementById('whatsapp');
     const listBarangInput = document.getElementById('list-Barang');
-    const beratTotalInput = document.getElementById('berat-total');
+    const bagasiInput = document.getElementById('berat-bagasi');
+    const kabinInput = document.getElementById('berat-kabin');
+    const khususInput = document.getElementById('berat-khusus');
+    const totalInput = document.getElementById('berat-total');
     const packInput = document.getElementById('total-packing');
     const fotoInput = document.getElementById('foto');
     const previewContainer = document.getElementById('preview-container');
@@ -238,13 +254,24 @@
     // ================================================================
     // FUNGSI BANTU
     // ================================================================
+    const updateBeratTotal = () => {
+        const bagasi = parseFloat(bagasiInput.value) || 0;
+        const kabin = parseFloat(kabinInput.value) || 0;
+        const khusus = parseFloat(khususInput.value) || 0;
+        totalInput.value = bagasi + kabin + khusus;
+    };
+
     function saveFormData() {
+        updateBeratTotal(); // Pastikan total berat juga tersimpan
         const fileList = Array.from(fotoInput.files).map(file => ({ name: file.name, size: file.size }));
         const data = {
             nama: namaInput.value,
             whatsapp: waInput.value,
             listBarang: listBarangInput.value,
-            beratTotal: beratTotalInput.value,
+            beratBagasi: bagasiInput.value,
+            beratKabin: kabinInput.value,
+            beratKhusus: khususInput.value,
+            beratTotal: totalInput.value,
             jumlahPack: packInput.value,
             kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '',
             fileInfo: fileList
@@ -259,7 +286,10 @@
             namaInput.value = data.nama || '';
             waInput.value = data.whatsapp || '';
             listBarangInput.value = data.listBarang || '';
-            beratTotalInput.value = data.beratTotal || '';
+            bagasiInput.value = data.beratBagasi || '';
+            kabinInput.value = data.beratKabin || '';
+            khususInput.value = data.beratKhusus || '';
+            totalInput.value = data.beratTotal || '';
             packInput.value = data.jumlahPack || '';
             if (data.kelengkapanStatus) {
                 const radio = document.querySelector(`input[name="kelengkapanStatus"][value="${data.kelengkapanStatus}"]`);
@@ -310,10 +340,10 @@
     // ================================================================
     // EVENT LISTENERS
     // ================================================================
-
     document.addEventListener('DOMContentLoaded', loadFormData);
     form.addEventListener('input', saveFormData);
     window.addEventListener('beforeunload', handleBeforeUnload);
+    [bagasiInput, kabinInput, khususInput].forEach(input => input.addEventListener('input', updateBeratTotal));
 
     fotoInput.addEventListener('change', (e) => {
         previewContainer.innerHTML = '';
@@ -352,7 +382,10 @@
                 nama: namaInput.value,
                 whatsapp: waInput.value,
                 listBarang: listBarangInput.value,
-                beratTotal: beratTotalInput.value,
+                beratBagasi: bagasiInput.value,
+                beratKabin: kabinInput.value,
+                beratKhusus: khususInput.value,
+                beratTotal: totalInput.value,
                 jumlahPack: packInput.value,
                 kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || 'Tidak diisi'
             };

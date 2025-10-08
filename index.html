@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pengiriman Barang</title>
+    <title>Cek Barang Indo Jepang</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
@@ -28,22 +28,22 @@
         }
 
         .fixed-header {
-            position: fixed; /* Membuat header tetap di posisinya */
-            top: 0; /* Menempel di bagian atas */
+            position: fixed;
+            top: 0;
             left: 0;
             width: 100%;
-            background-color: #ffffff; /* Latar belakang putih */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sedikit bayangan di bawah */
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             padding: 10px 0;
-            z-index: 1000; /* Memastikan header berada di atas elemen lain */
+            z-index: 1000;
         }
         
         .header-content {
-            max-width: 800px; /* Lebar konten sama dengan container Anda */
+            max-width: 800px;
             margin: 0 auto;
-            display: flex; /* Menggunakan flexbox untuk menata tombol */
-            justify-content: center; /* Memusatkan tombol secara horizontal */
-            gap: 20px; /* Jarak antar tombol */
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
         
         .header-btn {
@@ -57,19 +57,19 @@
         }
         
         .blue-btn {
-            background-color: #007bff; /* Biru */
+            background-color: #007bff;
         }
         
         .blue-btn:hover {
-            background-color: #0056b3; /* Biru lebih gelap saat hover */
+            background-color: #0056b3;
         }
         
         .green-btn {
-            background-color: #28a745; /* Hijau */
+            background-color: #28a745;
         }
         
         .green-btn:hover {
-            background-color: #1e7e34; /* Hijau lebih gelap saat hover */
+            background-color: #1e7e34;
         }
         
         .container {
@@ -80,7 +80,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        h1 { /* Mengganti h2 menjadi h1 untuk judul utama */
+        h1 {
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             text-align: center;
@@ -152,7 +152,7 @@
             background-color: #f0f0f0;
             border-radius: 5px;
             margin-top: 1.25rem;
-            display: none; /* Sembunyi secara default */
+            display: none;
         }
         #progressBar {
             width: 0%;
@@ -171,7 +171,7 @@
             font-weight: 500;
         }
         .whatsapp-btn {
-            display: none; /* Sembunyi secara default */
+            display: none;
             margin-top: 15px;
             padding: 10px 20px;
             background-color: var(--success-color);
@@ -201,7 +201,7 @@
         </div>
         <div class="input-group">
             <label for="whatsapp">Nomor WhatsApp</label>
-            <input type="tel" id="whatsapp" name="whatsapp" placeholder="Contoh: 08123456789" value="6281315431551">
+            <input type="tel" id="whatsapp" name="whatsapp" placeholder="Contoh: 08123456789">
         </div>
         <div class="input-group">
             <label for="list-Barang">List Barang</label>
@@ -241,8 +241,10 @@
                 <input type="radio" name="kelengkapanStatus" value="Belum Lengkap" style="width: auto; margin-right: 8px;"> Belum Lengkap
             </label>
         </div>
+        
         <button type="submit" class="submit-btn" id="submit-btn">Kirim Data</button>
         
+        <button type="button" id="dashboard-btn" class="submit-btn" style="margin-top: 10px; background-color: #ffc107; color: #333;">Kirim ke Dashboard</button>
         <div id="progressBarContainer">
             <div id="progressBar">0%</div>
         </div>
@@ -369,7 +371,7 @@
     }
 
     // ================================================================
-    // === EVENT LISTENERS ===
+    // === EVENT LISTENERS (YANG SUDAH ADA) ===
     // ================================================================
 
     document.addEventListener('DOMContentLoaded', loadFormData);
@@ -458,17 +460,14 @@
                 if (result.status === 'success') {
                     statusDiv.innerText = 'Data berhasil dikirim!';
                     statusDiv.style.color = 'var(--success-color)';
-                    const namaKakak = result.nama;
-                    const nomorWaBersih = result.whatsapp;
-                    const urlFolderBaru = result.folderUrl;
-                    const tanggalHariIni = new Date();
-                    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-                    const tanggalFormatted = tanggalHariIni.toLocaleDateString('id-ID', options);
-                    const whatsappMessage = `Hai kak ${namaKakak}, Barang kakak sudah kami terima dan sudah di cek per tanggal ${tanggalFormatted}. Semua foto barang kakak dapat dilihat di folder ini ya: ${urlFolderBaru}`;
+                    
+                    // Logika untuk menampilkan tombol WhatsApp (fungsi asli)
+                    const whatsappMessage = `Hai kak ${result.nama}, Barang kakak sudah kami terima dan sudah di cek per tanggal ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}. Semua foto barang kakak dapat dilihat di folder ini ya: ${result.folderUrl}`;
                     const encodedMessage = encodeURIComponent(whatsappMessage);
-                    const whatsappLink = `https://wa.me/${nomorWaBersih}?text=${encodedMessage}`;
+                    const whatsappLink = `https://wa.me/${result.whatsapp}?text=${encodedMessage}`;
                     whatsappBtn.href = whatsappLink;
-                    whatsappBtn.style.display = 'block';
+                    whatsappBtn.style.display = 'block'; // Tampilkan tombol WhatsApp di sini
+                    
                     form.reset();
                     previewContainer.innerHTML = '';
                     clearFormData();
@@ -500,6 +499,132 @@
             }, 5000);
         }
     });
+
+    // ================================================================
+    // === KODE BARU UNTUK FUNGSI & TOMBOL DASHBOARD ===
+    // ================================================================
+    
+    // ⬇️⬇️⬇️ GANTI URL DI BAWAH INI DENGAN URL GITHUB PAGES ANDA ⬇️⬇️⬇️
+    const DASHBOARD_URL = 'https://yanoshijapan.github.io/dashboardcek/'; 
+    // Contoh: const DASHBOARD_URL = 'https://yanoshi.github.io/notif-dashboard/';
+
+    const dashboardBtn = document.getElementById('dashboard-btn');
+
+    dashboardBtn.addEventListener('click', async () => {
+        // Nonaktifkan kedua tombol saat proses berjalan
+        submitBtn.disabled = true;
+        dashboardBtn.disabled = true;
+        dashboardBtn.innerText = 'Mengirim...';
+        
+        statusDiv.innerText = '';
+        whatsappBtn.style.display = 'none';
+        progressBarContainer.style.display = 'block';
+        progressBar.style.width = '10%';
+        progressBar.innerText = 'Mempersiapkan data...';
+        
+        try {
+            const files = fotoInput.files;
+            if (files.length === 0) {
+                alert('Harap pilih setidaknya satu foto.');
+                throw new Error("Tidak ada file dipilih.");
+            }
+
+            const textData = {
+                nama: namaInput.value,
+                whatsapp: waInput.value,
+                listBarang: document.getElementById('list-Barang').value,
+                beratBagasi: bagasiInput.value,
+                beratKabin: kabinInput.value,
+                beratKhusus: khususInput.value,
+                beratTotal: totalInput.value,
+                jumlahPack: packInput.value,
+                kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || 'Tidak diisi'
+            };
+        
+            const fileData = [];
+            for (let i = 0; i < files.length; i++) {
+                const progress = 10 + (40 / files.length * (i + 1));
+                progressBar.style.width = `${progress}%`;
+                progressBar.innerText = `Memproses file ${i + 1} dari ${files.length}...`;
+                const compressedContent = await compressImage(files[i], 300);
+                fileData.push({
+                    fileName: files[i].name,
+                    mimeType: 'image/jpeg',
+                    content: compressedContent
+                });
+            }
+
+            const payload = { ...textData, files: fileData };
+        
+            progressBar.style.width = '50%';
+            progressBar.innerText = 'Mengunggah file ke Spreadsheet...';
+
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+        
+            progressBar.style.width = '80%';
+            progressBar.innerText = 'Memproses data...';
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.status === 'success') {
+                    
+                    // --- BAGIAN PENTING UNTUK DASHBOARD ---
+                    const tanggalKlik = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    const templatePesan = `halo kak ${result.nama}, barang kakak sudah kami terima dan cek per tanggal ${tanggalKlik}. Untuk bukti fotonya kakak bisa cek di link berikut : ${result.folderUrl}`;
+
+                    const params = new URLSearchParams({
+                        nama: result.nama,
+                        wa: result.whatsapp,
+                        msg: templatePesan
+                    });
+
+                    const urlTujuan = `${DASHBOARD_URL}?${params.toString()}`;
+                    
+                    window.open(urlTujuan, '_blank');
+                    // --- AKHIR BAGIAN PENTING ---
+
+                    statusDiv.innerText = 'Data berhasil dikirim ke Spreadsheet & Dashboard!';
+                    statusDiv.style.color = 'var(--success-color)';
+                    
+                    form.reset();
+                    previewContainer.innerHTML = '';
+                    clearFormData();
+                    window.removeEventListener('beforeunload', handleBeforeUnload);
+                    const fileReminder = fotoInput.parentElement.querySelector('div[style*="margin-top: 10px"]');
+                    if (fileReminder) fileReminder.remove();
+                    
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan di server.');
+                }
+            } else {
+                throw new Error(`Gagal terhubung ke server (Status: ${response.status})`);
+            }
+            
+            progressBar.style.width = '100%';
+            progressBar.innerText = 'Selesai!';
+
+        } catch (error) {
+            statusDiv.innerText = `Error: ${error.message}`;
+            statusDiv.style.color = 'var(--error-color)';
+            progressBar.style.backgroundColor = 'var(--error-color)';
+            progressBar.innerText = 'Gagal';
+        } finally {
+            submitBtn.disabled = false;
+            dashboardBtn.disabled = false;
+            dashboardBtn.innerText = 'Kirim ke Dashboard';
+            setTimeout(() => {
+                progressBarContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressBar.style.backgroundColor = 'var(--success-color)';
+            }, 5000);
+        }
+    });
+
 </script>
 
 </body>

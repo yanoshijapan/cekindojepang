@@ -423,7 +423,7 @@
             if (result.status !== 'success') throw new Error(result.message || 'Terjadi kesalahan di server.');
 
             const tanggalKlik = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
-            const templatePesan = `halo kak ${result.nama}, barang kakak sudah kami terima dan cek per tanggal ${tanggalKlik}. Untuk bukti fotonya kakak bisa cek di link berikut : ${result.folderUrl}`;
+            const templatePesan = `Halo kak ${result.nama}, barang kakak sudah kami terima dan cek per tanggal ${tanggalKlik}. Untuk bukti fotonya kakak bisa cek di link berikut : ${result.folderUrl}`;
 
             const newDataForDashboard = {
                 nama: result.nama,

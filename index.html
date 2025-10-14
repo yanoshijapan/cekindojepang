@@ -156,6 +156,10 @@
             <input type="text" id="nama" name="nama">
         </div>
         <div class="input-group">
+            <label for="namaPenerima">Nama Penerima</label>
+            <input type="text" id="namaPenerima" name="namaPenerima">
+        </div>
+        <div class="input-group">
             <label for="whatsapp">Nomor WhatsApp</label>
             <input type="tel" id="whatsapp" name="whatsapp" placeholder="Contoh: 08123456789">
         </div>
@@ -237,6 +241,7 @@
     const STORAGE_KEY = 'formData';
     const form = document.getElementById('submissionForm');
     const namaInput = document.getElementById('nama');
+    const namaPenerimaInput = document.getElementById('namaPenerima');
     const waInput = document.getElementById('whatsapp');
     const listBarangInput = document.getElementById('list-Barang');
     const bagasiInput = document.getElementById('berat-bagasi');
@@ -266,6 +271,7 @@
         const fileList = Array.from(fotoInput.files).map(file => ({ name: file.name, size: file.size }));
         const data = {
             nama: namaInput.value,
+            namaPenerima: namaPenerimaInput.value,
             whatsapp: waInput.value,
             listBarang: listBarangInput.value,
             beratBagasi: bagasiInput.value,
@@ -284,6 +290,7 @@
         if (savedData) {
             const data = JSON.parse(savedData);
             namaInput.value = data.nama || '';
+            namaPenerimaInput.value = data.namaPenerima || '';
             waInput.value = data.whatsapp || '';
             listBarangInput.value = data.listBarang || '';
             bagasiInput.value = data.beratBagasi || '';
@@ -380,6 +387,7 @@
 
             const textData = {
                 nama: namaInput.value,
+                namaPenerima: namaPenerimaInput.value,
                 whatsapp: waInput.value,
                 listBarang: listBarangInput.value,
                 beratBagasi: bagasiInput.value,

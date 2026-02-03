@@ -2,224 +2,278 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Barang Indo Jepang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <title>Jastip - Cek Barang Indo Japan</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <style>
         :root {
-            --primary-color: #17a2b8;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --light-gray: #f9f9f9;
-            --dark-gray: #333;
-            --border-color: #ddd;
+            --primary: #2563EB;
+            --success: #10B981;
+            --error: #EF4444;
+            --background: #F3F4F6;
+            --surface: #ffffff;
+            --text-main: #1F2937;
+            --border: #D1D5DB;
+            --radius: 12px;
         }
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            margin: 0;
-            padding: 1rem;
-            padding-top: 70px;
-            -webkit-text-size-adjust: 100%;
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--background); color: var(--text-main); margin: 0; padding-bottom: 90px; }
+
+        /* --- HEADER (Updated) --- */
+        .app-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50;
+            padding: 1rem; border-bottom: 1px solid #E5E7EB;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 10px 0;
+        .app-brand { font-weight: 700; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .nav-actions { display: flex; gap: 12px; }
+        .nav-btn {
+            text-decoration: none; color: #4B5563; font-size: 1.3rem;
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: #F3F4F6; transition: all 0.2s;
+        }
+        .nav-btn:active { background: #E5E7EB; transform: scale(0.95); }
+        .nav-btn.green { color: #059669; background: #ECFDF5; } /* Style khusus tombol excel */
+
+        /* Container */
+        .container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+
+        /* Cards & Inputs (Sama seperti V2.1) */
+        .card { background: var(--surface); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
+        .section-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: #9CA3AF; text-transform: uppercase; margin-bottom: 1.2rem; border-bottom: 1px dashed #E5E7EB; padding-bottom: 0.5rem; }
+        .section-header i { color: var(--primary); font-size: 1rem; }
+
+        .input-wrapper { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 6px; }
+        .input-label { font-size: 0.9rem; font-weight: 600; color: #374151; margin-left: 2px; }
+        .modern-input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 1rem; background: #FAFAFA; color: var(--text-main); transition: all 0.2s ease; }
+        .modern-input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        textarea.modern-input { min-height: 120px; resize: vertical; line-height: 1.5; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* Radio & File Upload */
+        .segmented-group { display: flex; background: #F3F4F6; padding: 4px; border-radius: 10px; }
+        .segmented-option { flex: 1; text-align: center; }
+        .segmented-option input { display: none; }
+        .segmented-option label { display: block; padding: 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: #6B7280; cursor: pointer; transition: all 0.2s; }
+        .segmented-option input:checked + label { background: #fff; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
+
+        .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; background: #FAFAFA; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .upload-area:active { background: #EFF6FF; border-color: var(--primary); }
+        .upload-icon { font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .upload-text { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
+        .upload-sub { color: #9CA3AF; font-size: 0.8rem; }
+        
+        #file-persistence-msg { display: none; background-color: #FFFBEB; border: 1px solid #FCD34D; color: #B45309; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; }
+        #preview-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .preview-item { aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Footer Action */
+        .bottom-action { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); border-top: 1px solid #E5E7EB; padding: 1rem; box-shadow: 0 -4px 12px rgba(0,0,0,0.03); z-index: 40; backdrop-filter: blur(5px); }
+        .submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.1s; }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* --- POPUP MODAL (New Feature) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
             z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .header-btn {
-            padding: 8px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-            color: white;
-            transition: background-color 0.3s ease;
-        }
-        .blue-btn { background-color: #007bff; }
-        .blue-btn:hover { background-color: #0056b3; }
-        .green-btn { background-color: #28a745; }
-        .green-btn:hover { background-color: #1e7e34; }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        h1 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: white; width: 85%; max-width: 320px;
+            border-radius: 20px; padding: 2rem;
             text-align: center;
-            font-size: 1.5rem;
-            color: var(--dark-gray);
+            transform: translateY(20px); transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        .input-group { margin-bottom: 1.25rem; }
-        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
-        input[type="text"], input[type="tel"], textarea, input[type="file"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            box-sizing: border-box;
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+
+        .modal-icon-wrapper {
+            width: 70px; height: 70px; margin: 0 auto 1.5rem;
+            background: #F3F4F6; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; transition: all 0.3s;
         }
-        textarea { resize: vertical; min-height: 100px; }
-        input[type="file"] { padding: 0.5rem; }
-        .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 5px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            box-sizing: border-box;
-            background-color: var(--primary-color);
-            color: white;
-            transition: background-color 0.3s ease;
+        
+        /* State Colors */
+        .state-loading .modal-icon-wrapper { color: var(--primary); background: #EFF6FF; }
+        .state-success .modal-icon-wrapper { color: var(--success); background: #ECFDF5; }
+        .state-error .modal-icon-wrapper { color: var(--error); background: #FEF2F2; }
+
+        .spin-animation { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .modal-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--text-main); }
+        .modal-desc { font-size: 0.9rem; color: #6B7280; margin: 0 0 1.5rem; }
+
+        .progress-track {
+            height: 6px; background: #E5E7EB; border-radius: 100px;
+            overflow: hidden; width: 100%; margin-bottom: 1rem;
         }
-        .submit-btn:hover:not(:disabled) { background-color: #138496; }
-        .submit-btn:disabled { background-color: #a0a0a0; cursor: not-allowed; }
-        #preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+        .modal-btn {
+            background: var(--text-main); color: white;
+            border: none; padding: 10px 20px; border-radius: 8px;
+            font-weight: 600; width: 100%; cursor: pointer; display: none;
         }
-        #preview-container img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        #progressBarContainer {
-            width: 100%;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            margin-top: 1.25rem;
-            display: none;
-        }
-        #progressBar {
-            width: 0%;
-            height: 25px;
-            background-color: var(--success-color);
-            border-radius: 5px;
-            text-align: center;
-            line-height: 25px;
-            color: white;
-            font-size: 14px;
-            transition: width 0.3s ease;
-        }
-        #status { text-align: center; margin-top: 15px; font-weight: 500; }
+        .modal-btn.show { display: block; }
     </style>
 </head>
 <body>
 
-<header class="fixed-header">
-    <div class="header-content">
-        <a href="#" class="header-btn blue-btn">Home</a>
-        <a href="#" class="header-btn green-btn">Spreadsheet</a>
+<nav class="app-bar">
+    <div class="app-brand"><i class="ri-box-3-fill"></i> Cek Indo - Japan</div>
+    <div class="nav-actions">
+        <a href="https://docs.google.com/spreadsheets/d/15CtlzSn56c1oTL_FhayaumWPb6ZVXlE4b7GZ040_QH0/edit?gid=1011295621#gid=1011295621" target="_blank" class="nav-btn green" title="Buka Spreadsheet">
+            <i class="ri-file-excel-2-line"></i>
+        </a>
+        <a href="#" onclick="window.location.reload()" class="nav-btn" title="Reload / Home">
+            <i class="ri-home-4-line"></i>
+        </a>
     </div>
-</header>
-    
+</nav>
+
 <div class="container">
-    <h1>Form Cek Barang Indo-Jepang</h1>
     <form id="submissionForm">
-        <div class="input-group">
-            <label for="nama">Nama</label>
-            <input type="text" id="nama" name="nama">
-        </div>
-        <div class="input-group">
-            <label for="namaPenerima">Nama Penerima</label>
-            <input type="text" id="namaPenerima" name="namaPenerima">
-        </div>
-        <div class="input-group">
-            <label for="whatsapp">Nomor WhatsApp</label>
-            <input type="tel" id="whatsapp" name="whatsapp" placeholder="Contoh: 08123456789">
-        </div>
-        <div class="input-group">
-            <label for="list-Barang">List Barang</label>
-            <textarea id="list-Barang" name="listBarang"></textarea>
-        </div>
         
-        <div class="input-group">
-            <label for="berat-bagasi">Berat Bagasi (kg)</label>
-            <input type="tel" id="berat-bagasi" name="beratBagasi" placeholder="angka saja, contoh: 5">
+        <div class="card">
+            <div class="section-header"><i class="ri-user-smile-line"></i> Info Pengirim</div>
+            
+            <div class="input-wrapper">
+                <label for="nama" class="input-label">Nama Pengirim</label>
+                <input type="text" id="nama" name="nama" class="modern-input" required placeholder="Masukkan nama lengkap">
+            </div>
+            
+            <div class="input-wrapper">
+                <label for="namaPenerima" class="input-label">Nama Penerima</label>
+                <input type="text" id="namaPenerima" name="namaPenerima" class="modern-input" placeholder="Masukkan nama penerima">
+            </div>
+            
+            <div class="input-wrapper">
+                <label for="whatsapp" class="input-label">Nomor WhatsApp</label>
+                <input type="tel" id="whatsapp" name="whatsapp" class="modern-input" placeholder="0812..." inputmode="tel">
+            </div>
         </div>
-        <div class="input-group">
-            <label for="berat-kabin">Berat Kabin (kg)</label>
-            <input type="tel" id="berat-kabin" name="beratKabin" placeholder="angka saja, contoh: 5">
+
+        <div class="card">
+            <div class="section-header"><i class="ri-file-list-3-line"></i> Isi Paket</div>
+            <div class="input-wrapper">
+                <label for="list-Barang" class="input-label">List Barang</label>
+                <textarea id="list-Barang" name="listBarang" class="modern-input" placeholder="Contoh:&#10;1. Baju (2pcs)&#10;2. Tas (1pcs)"></textarea>
+            </div>
         </div>
-        <div class="input-group">
-            <label for="berat-khusus">Berat Khusus (kg)</label>
-            <input type="tel" id="berat-khusus" name="beratKhusus" placeholder="angka saja, contoh: 5">
+
+        <div class="card">
+            <div class="section-header"><i class="ri-scales-line"></i> Timbangan (KG)</div>
+            <div class="grid-2">
+                <div class="input-wrapper">
+                    <label for="berat-bagasi" class="input-label">Bagasi</label>
+                    <input type="number" id="berat-bagasi" class="modern-input" step="0.1" inputmode="decimal">
+                </div>
+                <div class="input-wrapper">
+                    <label for="berat-kabin" class="input-label">Kabin</label>
+                    <input type="number" id="berat-kabin" class="modern-input" step="0.1" inputmode="decimal">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="input-wrapper">
+                    <label for="berat-khusus" class="input-label">Khusus</label>
+                    <input type="number" id="berat-khusus" class="modern-input" step="0.1" inputmode="decimal">
+                </div>
+                <div class="input-wrapper">
+                    <label for="total-packing" class="input-label">Jumlah Packingan</label>
+                    <input type="number" id="total-packing" class="modern-input" inputmode="numeric">
+                </div>
+            </div>
+            <div class="input-wrapper" style="margin-bottom:0">
+                <label for="berat-total" class="input-label" style="color:var(--primary)">Total Berat (Auto)</label>
+                <input type="text" id="berat-total" class="modern-input" readonly style="background:#EFF6FF; border-color:#BFDBFE; font-weight:bold; color:var(--primary)">
+            </div>
         </div>
-        <div class="input-group">
-            <label for="berat-total">Berat Total (hasil totalan otomatis, tidak untuk diisi)</label>
-            <input type="tel" id="berat-total" name="beratTotal" readonly>
-        </div>
-        <div class="input-group">
-            <label for="total-packing">Jumlah Packingan</label>
-            <input type="tel" id="total-packing" name="jumlahPack" placeholder="angka saja, contoh: 5">
-        </div>
-        <div class="input-group">
-            <label for="foto">Foto Barang (maks. 10 foto)</label>
-            <input type="file" id="foto" name="foto" multiple accept="image/*">
+
+        <div class="card">
+            <div class="section-header"><i class="ri-camera-line"></i> Dokumentasi</div>
+            
+            <div class="input-wrapper">
+                <label class="input-label">Status Kelengkapan</label>
+                <div class="segmented-group">
+                    <div class="segmented-option">
+                        <input type="radio" name="kelengkapanStatus" id="stat-lengkap" value="Lengkap">
+                        <label for="stat-lengkap">Lengkap</label>
+                    </div>
+                    <div class="segmented-option">
+                        <input type="radio" name="kelengkapanStatus" id="stat-belum" value="Belum Lengkap">
+                        <label for="stat-belum">Belum</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border:none; border-top:1px dashed #E5E7EB; margin: 1.5rem 0;">
+
+            <div id="file-persistence-msg">
+                <i class="ri-error-warning-fill"></i> <b>File sebelumnya:</b><br>
+                <span id="prev-file-list"></span><br>
+                <small>Mohon pilih ulang foto-foto di atas.</small>
+            </div>
+
+            <div class="input-wrapper">
+                <label class="input-label">Foto Bukti Barang</label>
+                <label for="foto" class="upload-area">
+                    <div class="upload-icon"><i class="ri-image-add-fill"></i></div>
+                    <div class="upload-text">Ketuk untuk Ambil Foto</div>
+                    <div class="upload-sub">Maksimal 10 foto</div>
+                    <input type="file" id="foto" name="foto" multiple accept="image/*" style="display: none;">
+                </label>
+            </div>
             <div id="preview-container"></div>
         </div>
-        <div class="input-group">
-            <label>Status Kelengkapan Barang</label>
-            <label style="display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal;">
-                <input type="radio" name="kelengkapanStatus" value="Lengkap" style="width: auto; margin-right: 8px;"> Lengkap
-            </label>
-            <label style="display: inline-flex; align-items: center; font-weight: normal;">
-                <input type="radio" name="kelengkapanStatus" value="Belum Lengkap" style="width: auto; margin-right: 8px;"> Belum Lengkap
-            </label>
+
+        <div class="bottom-action">
+            <button type="submit" class="submit-btn" id="submit-btn">
+                <i class="ri-send-plane-fill"></i> Kirim Data
+            </button>
         </div>
-        
-        <button type="submit" class="submit-btn" id="submit-btn">Kirim Data & Notifikasi</button>
-        
-        <div id="progressBarContainer">
-            <div id="progressBar">0%</div>
-        </div>
-        <div id="status"></div>
     </form>
 </div>
 
-<script>
-    // ================================================================
-    // KONFIGURASI
-    // ================================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVMClfyvaY4_ioBneCE5NCyQPOTsa6ENw7-DLmIjeDtBOrv8gPCMDdLS0pEyiLj0Q1/exec'; // Ganti dengan URL Google Apps Script Anda
+<div id="loadingOverlay" class="modal-overlay">
+    <div class="modal-card state-loading">
+        <div class="modal-icon-wrapper">
+            <i id="modalIcon" class="ri-loader-4-line spin-animation"></i>
+        </div>
+        <h3 id="modalTitle" class="modal-title">Memproses Data</h3>
+        <p id="modalDesc" class="modal-desc">Mohon jangan tutup halaman ini...</p>
+        
+        <div class="progress-track" id="modalProgressTrack">
+            <div id="modalProgressBar" class="progress-fill"></div>
+        </div>
+        
+        <button id="modalCloseBtn" class="modal-btn" onclick="closeModal()">Tutup</button>
+    </div>
+</div>
 
-    // ⬇️⬇️ PASTE KUNCI KONFIGURASI FIREBASE ANDA DI SINI ⬇️⬇️
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+<script>
+    // --- KONFIGURASI ---
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVMClfyvaY4_ioBneCE5NCyQPOTsa6ENw7-DLmIjeDtBOrv8gPCMDdLS0pEyiLj0Q1/exec';
+    
     const firebaseConfig = {
       apiKey: "AIzaSyDqLE8jpK9zR8cYU4uox-ZRfGRkURsWPjQ",
       authDomain: "dashboard-cek-barang.firebaseapp.com",
@@ -230,241 +284,257 @@
       appId: "1:808568440133:web:3cc38a5d3c443b985baa2c",
       measurementId: "G-6GFVZX74GT"
     };
-    
-    // Inisialisasi Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    
-    // ================================================================
-    // VARIABEL GLOBAL
-    // ================================================================
-    const STORAGE_KEY = 'formData';
-    const form = document.getElementById('submissionForm');
-    const namaInput = document.getElementById('nama');
-    const namaPenerimaInput = document.getElementById('namaPenerima');
-    const waInput = document.getElementById('whatsapp');
-    const listBarangInput = document.getElementById('list-Barang');
-    const bagasiInput = document.getElementById('berat-bagasi');
-    const kabinInput = document.getElementById('berat-kabin');
-    const khususInput = document.getElementById('berat-khusus');
-    const totalInput = document.getElementById('berat-total');
-    const packInput = document.getElementById('total-packing');
-    const fotoInput = document.getElementById('foto');
-    const previewContainer = document.getElementById('preview-container');
-    const submitBtn = document.getElementById('submit-btn');
-    const progressBarContainer = document.getElementById('progressBarContainer');
-    const progressBar = document.getElementById('progressBar');
-    const statusDiv = document.getElementById('status');
 
-    // ================================================================
-    // FUNGSI BANTU
-    // ================================================================
-    const updateBeratTotal = () => {
-        const bagasi = parseFloat(bagasiInput.value) || 0;
-        const kabin = parseFloat(kabinInput.value) || 0;
-        const khusus = parseFloat(khususInput.value) || 0;
-        totalInput.value = bagasi + kabin + khusus;
+    // --- ELEMENTS & LOGIC ---
+    const STORAGE_KEY = 'yanoshi_form_backup';
+    const form = document.getElementById('submissionForm');
+    
+    // UI Elements
+    const els = {
+        nama: document.getElementById('nama'),
+        penerima: document.getElementById('namaPenerima'),
+        wa: document.getElementById('whatsapp'),
+        list: document.getElementById('list-Barang'),
+        bagasi: document.getElementById('berat-bagasi'),
+        kabin: document.getElementById('berat-kabin'),
+        khusus: document.getElementById('berat-khusus'),
+        total: document.getElementById('berat-total'),
+        pack: document.getElementById('total-packing'),
+        foto: document.getElementById('foto')
+    };
+    
+    const ui = {
+        preview: document.getElementById('preview-container'),
+        fileMsg: document.getElementById('file-persistence-msg'),
+        fileListSpan: document.getElementById('prev-file-list')
     };
 
-    function saveFormData() {
-        updateBeratTotal(); // Pastikan total berat juga tersimpan
-        const fileList = Array.from(fotoInput.files).map(file => ({ name: file.name, size: file.size }));
+    // Modal Elements
+    const modal = {
+        overlay: document.getElementById('loadingOverlay'),
+        card: document.querySelector('.modal-card'),
+        icon: document.getElementById('modalIcon'),
+        title: document.getElementById('modalTitle'),
+        desc: document.getElementById('modalDesc'),
+        bar: document.getElementById('modalProgressBar'),
+        track: document.getElementById('modalProgressTrack'),
+        btn: document.getElementById('modalCloseBtn')
+    };
+
+    // 1. MODAL FUNCTIONS
+    function showModal() {
+        modal.overlay.classList.add('active');
+        // Reset State to Loading
+        modal.card.className = 'modal-card state-loading';
+        modal.icon.className = 'ri-loader-4-line spin-animation';
+        modal.btn.classList.remove('show');
+        modal.track.style.display = 'block';
+        modal.bar.style.width = '0%';
+        modal.title.innerText = 'Persiapan...';
+        modal.desc.innerText = 'Mohon tunggu sebentar';
+        document.body.style.overflow = 'hidden'; // Disable scroll
+    }
+
+    function updateModal(percent, text) {
+        modal.bar.style.width = `${percent}%`;
+        modal.desc.innerText = text;
+    }
+
+    function modalSuccess() {
+        modal.card.className = 'modal-card state-success';
+        modal.icon.className = 'ri-checkbox-circle-fill'; // Ikon sukses
+        modal.title.innerText = 'Berhasil!';
+        modal.desc.innerText = 'Data telah terkirim dan tersimpan.';
+        modal.track.style.display = 'none';
+        modal.btn.innerText = 'Selesai & Reset';
+        modal.btn.classList.add('show');
+        
+        // Haptic feedback
+        if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+
+    function modalError(msg) {
+        modal.card.className = 'modal-card state-error';
+        modal.icon.className = 'ri-error-warning-fill'; // Ikon error
+        modal.title.innerText = 'Gagal Mengirim';
+        modal.desc.innerText = msg;
+        modal.track.style.display = 'none';
+        modal.btn.innerText = 'Tutup';
+        modal.btn.classList.add('show');
+        
+        if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
+    }
+
+    function closeModal() {
+        modal.overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        if (modal.card.classList.contains('state-success')) {
+            // Reset form jika sukses
+            form.reset();
+            localStorage.removeItem(STORAGE_KEY);
+            ui.preview.innerHTML = '';
+            ui.fileMsg.style.display = 'none';
+        }
+    }
+
+    // 2. STORAGE FUNCTIONS
+    function saveToStorage() {
+        const tot = (parseFloat(els.bagasi.value)||0) + (parseFloat(els.kabin.value)||0) + (parseFloat(els.khusus.value)||0);
+        els.total.value = tot > 0 ? tot.toFixed(2) : '';
+
+        const fileMeta = Array.from(els.foto.files).map(f => f.name);
         const data = {
-            nama: namaInput.value,
-            namaPenerima: namaPenerimaInput.value,
-            whatsapp: waInput.value,
-            listBarang: listBarangInput.value,
-            beratBagasi: bagasiInput.value,
-            beratKabin: kabinInput.value,
-            beratKhusus: khususInput.value,
-            beratTotal: totalInput.value,
-            jumlahPack: packInput.value,
-            kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '',
-            fileInfo: fileList
+            nama: els.nama.value,
+            penerima: els.penerima.value,
+            wa: els.wa.value,
+            list: els.list.value,
+            bagasi: els.bagasi.value,
+            kabin: els.kabin.value,
+            khusus: els.khusus.value,
+            total: els.total.value,
+            pack: els.pack.value,
+            status: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '',
+            fileMeta: fileMeta.length > 0 ? fileMeta : null
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    function loadFormData() {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            namaInput.value = data.nama || '';
-            namaPenerimaInput.value = data.namaPenerima || '';
-            waInput.value = data.whatsapp || '';
-            listBarangInput.value = data.listBarang || '';
-            bagasiInput.value = data.beratBagasi || '';
-            kabinInput.value = data.beratKabin || '';
-            khususInput.value = data.beratKhusus || '';
-            totalInput.value = data.beratTotal || '';
-            packInput.value = data.jumlahPack || '';
-            if (data.kelengkapanStatus) {
-                const radio = document.querySelector(`input[name="kelengkapanStatus"][value="${data.kelengkapanStatus}"]`);
-                if(radio) radio.checked = true;
+    function loadFromStorage() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        try {
+            const data = JSON.parse(saved);
+            els.nama.value = data.nama || '';
+            els.penerima.value = data.penerima || '';
+            els.wa.value = data.wa || '';
+            els.list.value = data.list || '';
+            els.bagasi.value = data.bagasi || '';
+            els.kabin.value = data.kabin || '';
+            els.khusus.value = data.khusus || '';
+            els.total.value = data.total || '';
+            els.pack.value = data.pack || '';
+            if (data.status) {
+                const rb = document.querySelector(`input[name="kelengkapanStatus"][value="${data.status}"]`);
+                if(rb) rb.checked = true;
             }
-            if (data.fileInfo && data.fileInfo.length > 0) {
-                const fileReminder = document.createElement('div');
-                fileReminder.style.cssText = 'margin-top: 10px; padding: 10px; background-color: #f0f0f0; border: 1px dashed #ccc; border-radius: 5px;';
-                fileReminder.innerHTML = `<strong>File sebelumnya:</strong> ${data.fileInfo.map(f => f.name).join(', ')}. <br/><small>Silakan pilih ulang file-file ini.</small>`;
-                fotoInput.parentElement.insertBefore(fileReminder, previewContainer);
+            if (data.fileMeta && Array.isArray(data.fileMeta)) {
+                ui.fileMsg.style.display = 'block';
+                ui.fileListSpan.innerText = data.fileMeta.join(', ');
             }
-        }
+        } catch (e) { console.log(e); }
     }
 
-    function clearFormData() {
-        localStorage.removeItem(STORAGE_KEY);
-    }
+    // 3. LISTENERS
+    document.addEventListener('DOMContentLoaded', loadFromStorage);
+    form.addEventListener('input', saveToStorage);
+    document.querySelectorAll('input[name="kelengkapanStatus"]').forEach(r => r.addEventListener('change', saveToStorage));
 
-    const handleBeforeUnload = (event) => {
-        event.preventDefault();
-        event.returnValue = '';
-    };
-
-    function compressImage(file, maxSizeKB = 300) {
-        return new Promise((resolve, reject) => {
+    els.foto.addEventListener('change', (e) => {
+        ui.preview.innerHTML = '';
+        ui.fileMsg.style.display = 'none';
+        saveToStorage();
+        if (e.target.files.length > 10) { alert('Maksimal 10 foto!'); e.target.value = ''; return; }
+        Array.from(e.target.files).forEach(file => {
             const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    if (file.size / 1024 <= maxSizeKB) {
-                        return resolve(img.src);
-                    }
-                    const canvas = document.createElement('canvas');
-                    const scale = Math.sqrt((maxSizeKB * 1024) / file.size);
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
-                };
+            reader.onload = (ev) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `<img src="${ev.target.result}">`;
+                ui.preview.appendChild(div);
             };
-            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
         });
-    }
-
-    // ================================================================
-    // EVENT LISTENERS
-    // ================================================================
-    document.addEventListener('DOMContentLoaded', loadFormData);
-    form.addEventListener('input', saveFormData);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    [bagasiInput, kabinInput, khususInput].forEach(input => input.addEventListener('input', updateBeratTotal));
-
-    fotoInput.addEventListener('change', (e) => {
-        previewContainer.innerHTML = '';
-        if (e.target.files.length > 10) {
-            alert('Maksimal 10 foto.');
-            e.target.value = '';
-            return;
-        }
-        for (const file of e.target.files) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = document.createElement('img');
-                img.src = event.target.result;
-                previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        }
     });
 
+    // 4. IMAGE COMPRESSION
+    const compressImage = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxSize = 800; 
+                let w = img.width, h = img.height;
+                if (w > h && w > maxSize) { h *= maxSize/w; w = maxSize; }
+                else if (h > maxSize) { w *= maxSize/h; h = maxSize; }
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        };
+    });
+
+    // 5. SUBMIT HANDLER (Updated for Modal)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Mengirim...';
-        statusDiv.innerText = '';
-        progressBarContainer.style.display = 'block';
-        progressBar.style.width = '10%';
-        progressBar.innerText = 'Mempersiapkan data...';
-
-        try {
-            if (fotoInput.files.length === 0) {
-                alert('Harap pilih setidaknya satu foto.');
-                throw new Error("Tidak ada file dipilih.");
-            }
-
-            const textData = {
-                nama: namaInput.value,
-                namaPenerima: namaPenerimaInput.value,
-                whatsapp: waInput.value,
-                listBarang: listBarangInput.value,
-                beratBagasi: bagasiInput.value,
-                beratKabin: kabinInput.value,
-                beratKhusus: khususInput.value,
-                beratTotal: totalInput.value,
-                jumlahPack: packInput.value,
-                kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || 'Tidak diisi'
-            };
         
-            const fileData = [];
-            for (let i = 0; i < fotoInput.files.length; i++) {
-                const progress = 10 + (40 / fotoInput.files.length * (i + 1));
-                progressBar.style.width = `${progress}%`;
-                progressBar.innerText = `Memproses file ${i + 1} dari ${fotoInput.files.length}...`;
-                const compressedContent = await compressImage(fotoInput.files[i]);
-                fileData.push({
-                    fileName: fotoInput.files[i].name,
+        if (els.foto.files.length === 0) { alert('Foto wajib diisi!'); return; }
+        
+        // Trigger Modal
+        showModal();
+        
+        try {
+            const filesData = [];
+            const totalFiles = els.foto.files.length;
+            
+            // Step 1: Compression
+            for (let i = 0; i < totalFiles; i++) {
+                updateModal(((i+1)/totalFiles)*40, `Mengompres foto ${i+1} dari ${totalFiles}...`);
+                const b64 = await compressImage(els.foto.files[i]);
+                filesData.push({
+                    fileName: els.foto.files[i].name,
                     mimeType: 'image/jpeg',
-                    content: compressedContent
+                    content: b64
                 });
             }
 
-            const payload = { ...textData, files: fileData };
-            progressBar.style.width = '50%';
-            progressBar.innerText = 'Mengunggah file ke Spreadsheet...';
+            // Step 2: Upload
+            updateModal(50, 'Mengirim data ke Spreadsheet...');
             
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                redirect: "follow",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
-            
-            progressBar.style.width = '80%';
-            progressBar.innerText = 'Memproses data...';
-
-            if (!response.ok) throw new Error(`Gagal terhubung ke server (Status: ${response.status})`);
-            
-            const result = await response.json();
-            if (result.status !== 'success') throw new Error(result.message || 'Terjadi kesalahan di server.');
-
-            const tanggalKlik = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
-            const templatePesan = `Halo kak ${result.nama}, barang kakak sudah kami terima dan cek per tanggal ${tanggalKlik}. Untuk bukti fotonya kakak bisa cek di link berikut : ${result.folderUrl}`;
-
-            const newDataForDashboard = {
-                nama: result.nama,
-                wa: result.whatsapp,
-                msg: templatePesan,
-                timestamp: new Date().toISOString()
+            const payload = {
+                nama: els.nama.value,
+                namaPenerima: els.penerima.value,
+                whatsapp: els.wa.value,
+                listBarang: els.list.value,
+                beratBagasi: els.bagasi.value,
+                beratKabin: els.kabin.value,
+                beratKhusus: els.khusus.value,
+                beratTotal: els.total.value,
+                jumlahPack: els.pack.value,
+                kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '-',
+                files: filesData
             };
 
-            database.ref('notifications').push(newDataForDashboard);
+            const req = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const res = await req.json();
+
+            if (res.status !== 'success') throw new Error(res.message);
+
+            // Step 3: Notification
+            updateModal(90, 'Mengirim notifikasi...');
             
-            statusDiv.innerText = 'Data berhasil dikirim!';
-            statusDiv.style.color = 'var(--success-color)';
-            progressBar.style.width = '100%';
-            progressBar.innerText = 'Selesai!';
+            const tgl = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            await database.ref('notifications').push({
+                nama: res.nama,
+                wa: res.whatsapp,
+                msg: `Halo kak ${res.nama}, barang kakak sudah kami terima dan cek per tanggal ${tgl}. Cek foto bukti di: ${res.folderUrl}`,
+                timestamp: new Date().toISOString()
+            });
 
-            form.reset();
-            previewContainer.innerHTML = '';
-            clearFormData();
-            window.removeEventListener('beforeunload', handleBeforeUnload);
+            // DONE
+            updateModal(100, 'Selesai!');
+            setTimeout(modalSuccess, 500);
 
-        } catch (error) {
-            statusDiv.innerText = `Error: ${error.message}`;
-            statusDiv.style.color = 'var(--error-color)';
-            progressBar.style.backgroundColor = 'var(--error-color)';
-            progressBar.innerText = 'Gagal';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Kirim Data & Notifikasi';
-            setTimeout(() => {
-                progressBarContainer.style.display = 'none';
-                progressBar.style.width = '0%';
-                progressBar.style.backgroundColor = 'var(--success-color)';
-            }, 5000);
+        } catch (err) {
+            modalError(err.message || 'Terjadi kesalahan jaringan.');
         }
     });
 </script>

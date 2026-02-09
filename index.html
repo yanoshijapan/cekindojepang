@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>Jastip - Cek Barang Indo Japan</title>
+    <title>Yanoshi - Cek Barang Indo - Jepang</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +29,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--background); color: var(--text-main); margin: 0; padding-bottom: 90px; }
 
-        /* --- HEADER (Updated) --- */
+        /* --- HEADER --- */
         .app-bar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -45,12 +45,12 @@
             border-radius: 50%; background: #F3F4F6; transition: all 0.2s;
         }
         .nav-btn:active { background: #E5E7EB; transform: scale(0.95); }
-        .nav-btn.green { color: #059669; background: #ECFDF5; } /* Style khusus tombol excel */
+        .nav-btn.green { color: #059669; background: #ECFDF5; }
 
         /* Container */
         .container { max-width: 600px; margin: 0 auto; padding: 1rem; }
 
-        /* Cards & Inputs (Sama seperti V2.1) */
+        /* Cards & Inputs */
         .card { background: var(--surface); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E5E7EB; }
         .section-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: #9CA3AF; text-transform: uppercase; margin-bottom: 1.2rem; border-bottom: 1px dashed #E5E7EB; padding-bottom: 0.5rem; }
         .section-header i { color: var(--primary); font-size: 1rem; }
@@ -86,7 +86,7 @@
         .submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.1s; }
         .submit-btn:active { transform: scale(0.98); }
 
-        /* --- POPUP MODAL (New Feature) --- */
+        /* --- POPUP MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
@@ -112,7 +112,6 @@
             font-size: 2.5rem; transition: all 0.3s;
         }
         
-        /* State Colors */
         .state-loading .modal-icon-wrapper { color: var(--primary); background: #EFF6FF; }
         .state-success .modal-icon-wrapper { color: var(--success); background: #ECFDF5; }
         .state-error .modal-icon-wrapper { color: var(--error); background: #FEF2F2; }
@@ -140,12 +139,12 @@
 <body>
 
 <nav class="app-bar">
-    <div class="app-brand"><i class="ri-box-3-fill"></i> Cek Indo - Japan</div>
+    <div class="app-brand"><i class="ri-box-3-fill"></i>Cek Indo - Jepang</div>
     <div class="nav-actions">
         <a href="https://docs.google.com/spreadsheets/d/15CtlzSn56c1oTL_FhayaumWPb6ZVXlE4b7GZ040_QH0/edit?gid=1011295621#gid=1011295621" target="_blank" class="nav-btn green" title="Buka Spreadsheet">
             <i class="ri-file-excel-2-line"></i>
         </a>
-        <a href="#" onclick="window.location.reload()" class="nav-btn" title="Reload / Home">
+        <a href="https://yanoshijastip.github.io/portal/index.html" onclick="window.location.reload()" class="nav-btn" title="Reload / Home">
             <i class="ri-home-4-line"></i>
         </a>
     </div>
@@ -199,7 +198,7 @@
                     <input type="number" id="berat-khusus" class="modern-input" step="0.1" inputmode="decimal">
                 </div>
                 <div class="input-wrapper">
-                    <label for="total-packing" class="input-label">Jumlah Packingan</label>
+                    <label for="total-packing" class="input-label">Jumlah Pack</label>
                     <input type="number" id="total-packing" class="modern-input" inputmode="numeric">
                 </div>
             </div>
@@ -224,6 +223,11 @@
                         <label for="stat-belum">Belum</label>
                     </div>
                 </div>
+            </div>
+
+            <div class="input-wrapper">
+                <label for="boxYamato" class="input-label">Box Yamato (Opsional)</label>
+                <input type="text" id="boxYamato" name="boxYamato" class="modern-input" placeholder="Info Box Yamato">
             </div>
 
             <hr style="border:none; border-top:1px dashed #E5E7EB; margin: 1.5rem 0;">
@@ -302,6 +306,7 @@
         khusus: document.getElementById('berat-khusus'),
         total: document.getElementById('berat-total'),
         pack: document.getElementById('total-packing'),
+        yamato: document.getElementById('boxYamato'), // <-- NEW ELEMENT
         foto: document.getElementById('foto')
     };
     
@@ -326,7 +331,6 @@
     // 1. MODAL FUNCTIONS
     function showModal() {
         modal.overlay.classList.add('active');
-        // Reset State to Loading
         modal.card.className = 'modal-card state-loading';
         modal.icon.className = 'ri-loader-4-line spin-animation';
         modal.btn.classList.remove('show');
@@ -334,7 +338,7 @@
         modal.bar.style.width = '0%';
         modal.title.innerText = 'Persiapan...';
         modal.desc.innerText = 'Mohon tunggu sebentar';
-        document.body.style.overflow = 'hidden'; // Disable scroll
+        document.body.style.overflow = 'hidden'; 
     }
 
     function updateModal(percent, text) {
@@ -344,26 +348,23 @@
 
     function modalSuccess() {
         modal.card.className = 'modal-card state-success';
-        modal.icon.className = 'ri-checkbox-circle-fill'; // Ikon sukses
+        modal.icon.className = 'ri-checkbox-circle-fill';
         modal.title.innerText = 'Berhasil!';
         modal.desc.innerText = 'Data telah terkirim dan tersimpan.';
         modal.track.style.display = 'none';
         modal.btn.innerText = 'Selesai & Reset';
         modal.btn.classList.add('show');
-        
-        // Haptic feedback
         if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
     }
 
     function modalError(msg) {
         modal.card.className = 'modal-card state-error';
-        modal.icon.className = 'ri-error-warning-fill'; // Ikon error
+        modal.icon.className = 'ri-error-warning-fill';
         modal.title.innerText = 'Gagal Mengirim';
         modal.desc.innerText = msg;
         modal.track.style.display = 'none';
         modal.btn.innerText = 'Tutup';
         modal.btn.classList.add('show');
-        
         if(navigator.vibrate) navigator.vibrate([300, 100, 300]);
     }
 
@@ -371,7 +372,6 @@
         modal.overlay.classList.remove('active');
         document.body.style.overflow = '';
         if (modal.card.classList.contains('state-success')) {
-            // Reset form jika sukses
             form.reset();
             localStorage.removeItem(STORAGE_KEY);
             ui.preview.innerHTML = '';
@@ -395,6 +395,7 @@
             khusus: els.khusus.value,
             total: els.total.value,
             pack: els.pack.value,
+            yamato: els.yamato.value, // <-- SAVE NEW INPUT
             status: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '',
             fileMeta: fileMeta.length > 0 ? fileMeta : null
         };
@@ -415,6 +416,8 @@
             els.khusus.value = data.khusus || '';
             els.total.value = data.total || '';
             els.pack.value = data.pack || '';
+            els.yamato.value = data.yamato || ''; // <-- LOAD NEW INPUT
+            
             if (data.status) {
                 const rb = document.querySelector(`input[name="kelengkapanStatus"][value="${data.status}"]`);
                 if(rb) rb.checked = true;
@@ -469,13 +472,12 @@
         };
     });
 
-    // 5. SUBMIT HANDLER (Updated for Modal)
+    // 5. SUBMIT HANDLER
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         if (els.foto.files.length === 0) { alert('Foto wajib diisi!'); return; }
         
-        // Trigger Modal
         showModal();
         
         try {
@@ -501,11 +503,12 @@
                 namaPenerima: els.penerima.value,
                 whatsapp: els.wa.value,
                 listBarang: els.list.value,
-                beratBagasi: els.bagasi.value.replace('.', ','),
-                beratKabin: els.kabin.value.replace('.', ','),
-                beratKhusus: els.khusus.value.replace('.', ','),
-                beratTotal: els.total.value.replace('.', ','),
+                beratBagasi: els.bagasi.value,
+                beratKabin: els.kabin.value,
+                beratKhusus: els.khusus.value,
+                beratTotal: els.total.value,
                 jumlahPack: els.pack.value,
+                boxYamato: els.yamato.value, // <-- SEND NEW INPUT KEY
                 kelengkapanStatus: document.querySelector('input[name="kelengkapanStatus"]:checked')?.value || '-',
                 files: filesData
             };
